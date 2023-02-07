@@ -1,0 +1,22 @@
+---
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: example-go-app
+spec:
+  build:
+    env:
+      - name: APP_USER
+        value: Test User
+        valueFrom: {}
+  # The location of the source code for the workload. Specify one
+  # of `spec.source` or `spec.image`
+  # +optional
+  source:
+
+    # Source code location in a git repository.
+    # +optional
+    git:
+      ref:
+        branch: main
+      url: https://github.com/carlosonunez-vmw/example-go-app
