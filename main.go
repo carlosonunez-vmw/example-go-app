@@ -49,10 +49,6 @@ var (
 	counterMap = map[int64]*counter{}
 )
 
-func increment(c Counter, d int) error {
-	return c.Add(d)
-}
-
 func incrementError(w http.ResponseWriter, msg string) {
 	e, err := json.Marshal(&counterError{Message: msg})
 	if err != nil {
@@ -76,32 +72,51 @@ func incrementHandler(w http.ResponseWriter, r *http.Request) {
 		incrementError(w, fmt.Sprintf("not a number: %s", vals[0]))
 		return
 	}
-	var c counter
+	var c *counter
 	session, _ := store.Get(r, cookieName)
+	log.Printf("session: %+v", session.Values)
 	sessionID, ok := session.Values["sessionid"]
 	if !ok {
 		id := time.Now().Unix()
+		log.Printf("saving new sessionid %d", id)
 		session.Values["sessionid"] = fmt.Sprintf("%d", id)
-		c = counter{value: 0}
-		counterMap[id] = &c
-		session.Save(r, w)
+		c = &counter{value: 0}
+		counterMap[id] = c
 	} else {
-		c = *counterMap[sessionID.(int64)]
+		idStr, ok := sessionID.(string)
+		if !ok {
+			http.Error(w, fmt.Sprintf("unable to parse session ID: %+v", sessionID), http.StatusInternalServerError)
+			return
+		}
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("invalid session ID: %s", idStr), http.StatusInternalServerError)
+			return
+		}
+		if _, ok := counterMap[id]; !ok {
+			log.Printf("initializing session ID %s", idStr)
+			counterMap[id] = &counter{value: 0}
+		}
+		c = counterMap[id]
 	}
 	res := counterResult{InitialValue: c.value}
+	log.Printf("before add: %+v", &c)
 	if err := c.Add(val); err != nil {
 		incrementError(w, fmt.Sprintf("increment failed: %s", err.Error()))
 		return
 	}
+	log.Printf("after add: %+v", &c)
 	res.NewValue = c.value
 	out, err := json.Marshal(&res)
 	if err != nil {
 		http.Error(w, "failed to render incremented object", http.StatusInternalServerError)
 	}
+	session.Save(r, w)
 	fmt.Fprintf(w, string(out))
 }
 
 func main() {
 	http.HandleFunc("/add", incrementHandler)
+	log.Print("Example Go App is running on port 5000")
 	log.Fatal(http.ListenAndServe(":5000", nil))
 }
