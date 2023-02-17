@@ -1,15 +1,31 @@
 # Example Go App
 
 This is a really simple Golang application that is destined to run within Tanzu
-Application Platform (TAP)
+Application Platform (TAP).
+
+It adds numbers, like this:
+
+```sh
+curl -X POST localhost:5000/add?by=10
+# {"initial":0,"new":10}
+```
+
+If you have cookies enabled, it will increment the last number you added.
+
+```sh
+curl --cookie-jar /path/to/cookies \
+  -b /path/to/cookies \
+  -X POST localhost:5000/add?by=10
+# {"initial":30,"new":40}
+```
 
 ## How To Use It
 
 ### Docker
 
-Build the image: `docker build -t app .`
-
-Then create a container from it: `docker run --rm -e APP_USER="Your Name" app`
+- Build the image: `docker build -t app .`
+- Then create a container from it: `docker run --rm -p 5000:5000 app`
+- Then add stuff! `curl -X PUT localhost:5000/add?by=10`
 
 ### Tanzu Application Platform
 
