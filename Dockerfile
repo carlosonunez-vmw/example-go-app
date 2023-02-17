@@ -3,6 +3,6 @@ COPY . /app
 WORKDIR /app
 RUN go build -o /test-app . && chmod +x /test-app
 
-FROM scratch AS app
-COPY --from=base /test-app /
+FROM busybox AS app
+COPY --from=base /test-app /test-app
 ENTRYPOINT [ "/test-app" ]
