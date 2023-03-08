@@ -58,8 +58,8 @@ func incrementError(w http.ResponseWriter, msg string) {
 }
 
 func incrementHandler(w http.ResponseWriter, r *http.Request) {
-	if strings.ToLower(r.Method) != "post" {
-		incrementError(w, "please resend as a POST")
+	if strings.ToLower(r.Method) != "put" {
+		incrementError(w, "please resend as a PUT")
 		return
 	}
 	vals, ok := r.URL.Query()["by"]
@@ -82,6 +82,7 @@ func incrementHandler(w http.ResponseWriter, r *http.Request) {
 		session.Values["sessionid"] = fmt.Sprintf("%d", id)
 		c = &counter{value: 0}
 		counterMap[id] = c
+		sessionID = id
 	} else {
 		idStr, ok := sessionID.(string)
 		if !ok {
@@ -98,14 +99,15 @@ func incrementHandler(w http.ResponseWriter, r *http.Request) {
 			counterMap[id] = &counter{value: 0}
 		}
 		c = counterMap[id]
+		sessionID = id
 	}
 	res := counterResult{InitialValue: c.value}
-	log.Printf("before add: %+v", &c)
+	log.Printf("[%d] before add: %d", sessionID, &c)
 	if err := c.Add(val); err != nil {
 		incrementError(w, fmt.Sprintf("increment failed: %s", err.Error()))
 		return
 	}
-	log.Printf("after add: %+v", &c)
+	log.Printf("[%d] before add: %d", sessionID, c)
 	res.NewValue = c.value
 	out, err := json.Marshal(&res)
 	if err != nil {

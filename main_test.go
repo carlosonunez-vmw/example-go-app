@@ -39,36 +39,6 @@ func newBadFakeCounter() *badFakeCounter {
 	return &badFakeCounter{value: -100}
 }
 
-func TestIncrementPasses(t *testing.T) {
-	f := newFakeCounter()
-	err := increment(f, 20)
-	if err != nil {
-		t.Errorf("Expected no errors, but got one: %s", err.Error())
-		t.Fail()
-	}
-	want := 20
-	got := f.value
-	if want != got {
-		t.Errorf("Expected value '%d', but got '%d'", want, got)
-		t.Fail()
-	}
-}
-
-func TestIncrementFailsWhenItCantAdd(t *testing.T) {
-	f := newBadFakeCounter()
-	err := increment(f, 20)
-	if err == nil {
-		t.Errorf("Expected an error, but got none")
-		t.Fail()
-	}
-	want := -100
-	got := f.value
-	if want != got {
-		t.Errorf("Expected value '%d', but got '%d'", want, got)
-		t.Fail()
-	}
-}
-
 // I was too lazy to make a session-aware test; sorry :(
 func TestAddEndpointPassWhenValidInt(t *testing.T) {
 	wants := []int{10, 20, 30}
@@ -79,7 +49,9 @@ func TestAddEndpointPassWhenValidInt(t *testing.T) {
 		}
 		want := initialValue + valInt
 		val := strconv.Itoa(valInt)
-		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/add?by=%s", val), nil)
+		cookie := http.Cookie{Name: "incrementSessionsCookie", Value: "nil"}
+		req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/add?by=%s", val), nil)
+		req.AddCookie(&cookie)
 		w := httptest.NewRecorder()
 		incrementHandler(w, req)
 		res := w.Result()

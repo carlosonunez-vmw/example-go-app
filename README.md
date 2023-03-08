@@ -1,7 +1,7 @@
 # Example Go App
 
-This is a really simple Golang application that is destined to run within Tanzu
-Application Platform (TAP).
+This is a really simple Golang application that demonstrates custom apps and
+their accelerators within Tanzu Application Platform (TAP).
 
 It adds numbers, like this:
 
@@ -15,7 +15,7 @@ If you have cookies enabled, it will increment the last number you added.
 ```sh
 curl --cookie-jar /path/to/cookies \
   -b /path/to/cookies \
-  -X POST localhost:5000/add?by=10
+  -X PUT localhost:5000/add?by=10
 # {"initial":30,"new":40}
 ```
 
