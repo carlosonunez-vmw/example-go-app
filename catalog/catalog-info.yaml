@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: counter-app
+  annotations:
+    "backstage.io/kubernetes-label-selector": "app.kubernetes.io/part-of=counter-app"
+spec:
+  type: web
+  lifecycle: stable
