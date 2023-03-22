@@ -120,5 +120,5 @@ func incrementHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/add", incrementHandler)
 	log.Print("Example Go App is running on port 5000")
-	log.Fatal(http.ListenAndServe(":5000", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
