@@ -3,11 +3,18 @@ apiVersion: carto.run/v1alpha1
 kind: Workload
 metadata:
   name: example-go-app
+  labels:
+    apps.tanzu.vmware.com/has-tests: "true"
+    app.kubernetes.io/part-of: carloss-web-app
+    apps.tanzu.vmware.com/workload-type: web
 spec:
   build:
     env:
       - name: APP_USER
         value: Test User
+        valueFrom: {}
+      - name: BP_GO_VERSION
+        value: 1.18
         valueFrom: {}
   # The location of the source code for the workload. Specify one
   # of `spec.source` or `spec.image`
