@@ -13,7 +13,7 @@ spec:
       - name: APP_USER
         value: "Test User"
       - name: BP_GO_VERSION
-        value: "1.18"
+        value: 1.18
   # The location of the source code for the workload. Specify one
   # of `spec.source` or `spec.image`
   # +optional
